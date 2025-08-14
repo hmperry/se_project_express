@@ -14,7 +14,7 @@ const getUsers = (req, res) => {
     });
 };
 
-//CREATE User
+// CREATE User
 const createUser = (req, res) => {
   const { name, avatar } = req.body;
   console.log(name, avatar);
@@ -30,7 +30,7 @@ const createUser = (req, res) => {
     });
 };
 
-//GET User by ID
+// GET User by ID
 const getUserById = (req, res) => {
   const { userId } = req.params;
   User.findById(userId)
@@ -41,7 +41,8 @@ const getUserById = (req, res) => {
       console.error(err);
       if (err.name === "DocumentNotFoundError") {
         return res.status(404).send({ message: err.message });
-      } else if (err.name === "CastError") {
+      }
+      if (err.name === "CastError") {
         return res.status(400).send({ message: err.message });
       }
       return res.status(500).send({ message: err.message });
