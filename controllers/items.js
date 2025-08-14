@@ -1,6 +1,6 @@
 const Item = require("../models/item");
 
-//GET Items
+// GET Items
 
 const getItems = (req, res) => {
   console.log("IN CONTROLLER for ITEMS");
@@ -32,10 +32,10 @@ const createItem = (req, res) => {
     });
 };
 
-//DELETE Item by ID
+// DELETE Item by ID
 const deleteItem = (req, res) => {
   console.log("CONTROLLER DELETE ITEM");
-  const itemId = req.params.itemId;
+  const { itemId } = req.params;
 
   Item.findByIdAndDelete(itemId)
     .orFail()
@@ -44,17 +44,18 @@ const deleteItem = (req, res) => {
       console.error(err);
       if (err.name === "DocumentNotFoundError") {
         return res.status(404).send({ message: err.message });
-      } else if (err.name === "CastError") {
+      }
+      if (err.name === "CastError") {
         return res.status(400).send({ message: err.message });
       }
       return res.status(500).send({ message: err.message });
     });
 };
 
-//Update Like
+// Update Like
 const likeItem = (req, res) => {
   console.log("CONTROLLER LIKE ITEM");
-  const itemId = req.params.itemId;
+  const { itemId } = req.params;
 
   Item.findByIdAndUpdate(
     itemId,
@@ -67,17 +68,18 @@ const likeItem = (req, res) => {
       console.error(err);
       if (err.name === "DocumentNotFoundError") {
         return res.status(404).send({ message: err.message });
-      } else if (err.name === "CastError") {
+      }
+      if (err.name === "CastError") {
         return res.status(400).send({ message: err.message });
       }
       return res.status(500).send({ message: err.message });
     });
 };
 
-//Dislike Item
+// Dislike Item
 const dislikeItem = (req, res) => {
   console.log("CONTROLLER DISLIKE ITEM");
-  const itemId = req.params.itemId;
+  const { itemId } = req.params;
 
   Item.findByIdAndUpdate(
     itemId,
@@ -90,7 +92,8 @@ const dislikeItem = (req, res) => {
       console.error(err);
       if (err.name === "DocumentNotFoundError") {
         return res.status(404).send({ message: err.message });
-      } else if (err.name === "CastError") {
+      }
+      if (err.name === "CastError") {
         return res.status(400).send({ message: err.message });
       }
       return res.status(500).send({ message: err.message });
