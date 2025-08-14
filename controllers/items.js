@@ -1,9 +1,8 @@
 const Item = require("../models/item");
 const {
-  BAD_REQUEST_VALIDATION_ERROR,
   INTERNAL_SERVER_ERROR_CODE,
-  BAD_REQUEST_INVALID_USER_ID,
-  BAD_REQUEST_DOCUMENT_NOT_FOUND,
+  BAD_REQUEST_ERROR_CODE,
+  NOT_FOUND_ERROR_CODE,
 } = require("../utils/errors");
 
 // GET Items
@@ -35,7 +34,7 @@ const createItem = (req, res) => {
       console.error(err);
       if (err.name === "ValidationError") {
         return res
-          .status(BAD_REQUEST_VALIDATION_ERROR)
+          .status(BAD_REQUEST_ERROR_CODE)
           .send({ message: "An error occurred from failed data validation." });
       }
       return res
@@ -56,12 +55,12 @@ const deleteItem = (req, res) => {
       console.error(err);
       if (err.name === "DocumentNotFoundError") {
         return res
-          .status(BAD_REQUEST_DOCUMENT_NOT_FOUND)
+          .status(NOT_FOUND_ERROR_CODE)
           .send({ message: "There is no item or uder with the requested ID." });
       }
       if (err.name === "CastError") {
         return res
-          .status(BAD_REQUEST_INVALID_USER_ID)
+          .status(BAD_REQUEST_ERROR_CODE)
           .send({ message: "An error has occurred because of invalid data." });
       }
       return res
@@ -86,12 +85,12 @@ const likeItem = (req, res) => {
       console.error(err);
       if (err.name === "DocumentNotFoundError") {
         return res
-          .status(BAD_REQUEST_DOCUMENT_NOT_FOUND)
+          .status(NOT_FOUND_ERROR_CODE)
           .send({ message: "There is no item or uder with the requested ID." });
       }
       if (err.name === "CastError") {
         return res
-          .status(BAD_REQUEST_INVALID_USER_ID)
+          .status(BAD_REQUEST_ERROR_CODE)
           .send({ message: "An error has occurred because of invalid data." });
       }
       return res
@@ -116,12 +115,12 @@ const dislikeItem = (req, res) => {
       console.error(err);
       if (err.name === "DocumentNotFoundError") {
         return res
-          .status(BAD_REQUEST_DOCUMENT_NOT_FOUND)
+          .status(NOT_FOUND_ERROR_CODE)
           .send({ message: "There is no item or uder with the requested ID." });
       }
       if (err.name === "CastError") {
         return res
-          .status(BAD_REQUEST_INVALID_USER_ID)
+          .status(BAD_REQUEST_ERROR_CODE)
           .send({ message: "An error has occurred because of invalid data." });
       }
       return res
