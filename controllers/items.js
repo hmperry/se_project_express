@@ -1,4 +1,10 @@
 const Item = require("../models/item");
+const {
+  BAD_REQUEST_VALIDATION_ERROR,
+  INTERNAL_SERVER_ERROR_CODE,
+  BAD_REQUEST_INVALID_USER_ID,
+  BAD_REQUEST_DOCUMENT_NOT_FOUND,
+} = require("../utils/errors");
 
 // GET Items
 
@@ -10,7 +16,9 @@ const getItems = (req, res) => {
     })
     .catch((err) => {
       console.error(err);
-      return res.status(500).send({ message: err.message });
+      return res
+        .status(INTERNAL_SERVER_ERROR_CODE)
+        .send({ message: "An error has occurred on the server." });
     });
 };
 
@@ -26,9 +34,13 @@ const createItem = (req, res) => {
     .catch((err) => {
       console.error(err);
       if (err.name === "ValidationError") {
-        return res.status(400).send({ message: err.message });
+        return res
+          .status(BAD_REQUEST_VALIDATION_ERROR)
+          .send({ message: "An error occurred from failed data validation." });
       }
-      return res.status(500).send({ message: err.message });
+      return res
+        .status(INTERNAL_SERVER_ERROR_CODE)
+        .send({ message: "An error has occurred on the server." });
     });
 };
 
@@ -43,12 +55,18 @@ const deleteItem = (req, res) => {
     .catch((err) => {
       console.error(err);
       if (err.name === "DocumentNotFoundError") {
-        return res.status(404).send({ message: err.message });
+        return res
+          .status(BAD_REQUEST_DOCUMENT_NOT_FOUND)
+          .send({ message: "There is no item or uder with the requested ID." });
       }
       if (err.name === "CastError") {
-        return res.status(400).send({ message: err.message });
+        return res
+          .status(BAD_REQUEST_INVALID_USER_ID)
+          .send({ message: "An error has occurred because of invalid data." });
       }
-      return res.status(500).send({ message: err.message });
+      return res
+        .status(INTERNAL_SERVER_ERROR_CODE)
+        .send({ message: "An error has occurred on the server." });
     });
 };
 
@@ -67,12 +85,18 @@ const likeItem = (req, res) => {
     .catch((err) => {
       console.error(err);
       if (err.name === "DocumentNotFoundError") {
-        return res.status(404).send({ message: err.message });
+        return res
+          .status(BAD_REQUEST_DOCUMENT_NOT_FOUND)
+          .send({ message: "There is no item or uder with the requested ID." });
       }
       if (err.name === "CastError") {
-        return res.status(400).send({ message: err.message });
+        return res
+          .status(BAD_REQUEST_INVALID_USER_ID)
+          .send({ message: "An error has occurred because of invalid data." });
       }
-      return res.status(500).send({ message: err.message });
+      return res
+        .status(INTERNAL_SERVER_ERROR_CODE)
+        .send({ message: "An error has occurred on the server." });
     });
 };
 
@@ -91,12 +115,18 @@ const dislikeItem = (req, res) => {
     .catch((err) => {
       console.error(err);
       if (err.name === "DocumentNotFoundError") {
-        return res.status(404).send({ message: err.message });
+        return res
+          .status(BAD_REQUEST_DOCUMENT_NOT_FOUND)
+          .send({ message: "There is no item or uder with the requested ID." });
       }
       if (err.name === "CastError") {
-        return res.status(400).send({ message: err.message });
+        return res
+          .status(BAD_REQUEST_INVALID_USER_ID)
+          .send({ message: "An error has occurred because of invalid data." });
       }
-      return res.status(500).send({ message: err.message });
+      return res
+        .status(INTERNAL_SERVER_ERROR_CODE)
+        .send({ message: "An error has occurred on the server." });
     });
 };
 

@@ -1,4 +1,10 @@
 const User = require("../models/user");
+const {
+  BAD_REQUEST_VALIDATION_ERROR,
+  BAD_REQUEST_SERVER_ERROR,
+  BAD_REQUEST_INVALID_USER_ID,
+  BAD_REQUEST_DOCUMENT_NOT_FOUND,
+} = require("../utils/errors");
 
 // GET /users
 
@@ -10,7 +16,9 @@ const getUsers = (req, res) => {
     })
     .catch((err) => {
       console.error(err);
-      return res.status(500).send({ message: err.message });
+      return res
+        .status(BAD_REQUEST_SERVER_ERROR)
+        .send({ message: "An error has occurred on the server." });
     });
 };
 
@@ -24,9 +32,13 @@ const createUser = (req, res) => {
     .catch((err) => {
       console.error(err);
       if (err.name === "ValidationError") {
-        return res.status(400).send({ message: err.message });
+        return res
+          .status(BAD_REQUEST_VALIDATION_ERROR)
+          .send({ message: "An error occurred from failed data validation." });
       }
-      return res.status(500).send({ message: err.message });
+      return res
+        .status(BAD_REQUEST_SERVER_ERROR)
+        .send({ message: "An error has occurred on the server." });
     });
 };
 
@@ -40,12 +52,18 @@ const getUserById = (req, res) => {
     .catch((err) => {
       console.error(err);
       if (err.name === "DocumentNotFoundError") {
-        return res.status(404).send({ message: err.message });
+        return res
+          .status(BAD_REQUEST_DOCUMENT_NOT_FOUND)
+          .send({ message: "There is no item or uder with the requested ID." });
       }
       if (err.name === "CastError") {
-        return res.status(400).send({ message: err.message });
+        return res
+          .status(BAD_REQUEST_INVALID_USER_ID)
+          .send({ message: "An error has occurred because of invalid data." });
       }
-      return res.status(500).send({ message: err.message });
+      return res
+        .status(BAD_REQUEST_SERVER_ERROR)
+        .send({ message: "An error has occurred on the server." });
     });
 };
 

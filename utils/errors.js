@@ -1,0 +1,3 @@
+export const NOT_FOUND_ERROR_CODE = 404;
+export const BAD_REQUEST_INVALID_USER_ID = 400;
+export const INTERNAL_SERVER_ERROR_CODE = 500;
