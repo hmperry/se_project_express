@@ -11,7 +11,7 @@ const getUsers = (req, res) => {
   console.log("IN CONTROLLER");
   User.find({})
     .then((users) => {
-      res.status(200).send(users);
+      res.send(users);
     })
     .catch((err) => {
       console.error(err);
@@ -46,14 +46,14 @@ const getUserById = (req, res) => {
   const { userId } = req.params;
   User.findById(userId)
     .orFail()
-    .then((user) => res.status(200).send(user))
+    .then((user) => res.send(user))
 
     .catch((err) => {
       console.error(err);
       if (err.name === "DocumentNotFoundError") {
         return res
           .status(NOT_FOUND_ERROR_CODE)
-          .send({ message: "There is no item or uder with the requested ID." });
+          .send({ message: "There is no item or user with the requested ID." });
       }
       if (err.name === "CastError") {
         return res

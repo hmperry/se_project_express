@@ -11,7 +11,7 @@ const getItems = (req, res) => {
   console.log("IN CONTROLLER for ITEMS");
   Item.find({})
     .then((items) => {
-      res.status(200).send(items);
+      res.send(items);
     })
     .catch((err) => {
       console.error(err);

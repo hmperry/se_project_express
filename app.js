@@ -1,9 +1,12 @@
 const express = require("express");
 const mongoose = require("mongoose");
+const helmet = require("helmet");
 const mainRouter = require("./routes/index");
 
 const app = express();
 const { PORT = 3001 } = process.env;
+
+app.use(helmet());
 
 app.use((req, res, next) => {
   req.user = {
