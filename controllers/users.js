@@ -1,4 +1,5 @@
 const User = require("../models/user");
+const bcrypt = require("bcrypt");
 const {
   INTERNAL_SERVER_ERROR_CODE,
   BAD_REQUEST_ERROR_CODE,
@@ -23,10 +24,10 @@ const getUsers = (req, res) => {
 
 // CREATE User
 const createUser = (req, res) => {
-  const { name, avatar } = req.body;
-  console.log(name, avatar);
+  const { name, avatar, email, password } = req.body;
+  console.log(name, avatar, email, password);
 
-  User.create({ name, avatar })
+  User.create({ name, avatar, email, password })
     .then((user) => res.status(201).send(user))
     .catch((err) => {
       console.error(err);
