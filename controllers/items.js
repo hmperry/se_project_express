@@ -48,25 +48,29 @@ const deleteItem = (req, res) => {
   console.log("CONTROLLER DELETE ITEM");
   const { itemId } = req.params;
 
-  Item.findByIdAndDelete(itemId)
-    .orFail()
-    .then((item) => res.send({ data: item }))
-    .catch((err) => {
-      console.error(err);
-      if (err.name === "DocumentNotFoundError") {
+  if (item.owner.toString() !== req.user._id) {
+    return res.status(403).send({ message: "Access denied" });
+  } else {
+    Item.findByIdAndDelete(itemId)
+      .orFail()
+      .then((item) => res.send({ data: item }))
+      .catch((err) => {
+        console.error(err);
+        if (err.name === "DocumentNotFoundError") {
+          return res.status(NOT_FOUND_ERROR_CODE).send({
+            message: "There is no item or uder with the requested ID.",
+          });
+        }
+        if (err.name === "CastError") {
+          return res.status(BAD_REQUEST_ERROR_CODE).send({
+            message: "An error has occurred because of invalid data.",
+          });
+        }
         return res
-          .status(NOT_FOUND_ERROR_CODE)
-          .send({ message: "There is no item or uder with the requested ID." });
-      }
-      if (err.name === "CastError") {
-        return res
-          .status(BAD_REQUEST_ERROR_CODE)
-          .send({ message: "An error has occurred because of invalid data." });
-      }
-      return res
-        .status(INTERNAL_SERVER_ERROR_CODE)
-        .send({ message: "An error has occurred on the server." });
-    });
+          .status(INTERNAL_SERVER_ERROR_CODE)
+          .send({ message: "An error has occurred on the server." });
+      });
+  }
 };
 
 // Update Like

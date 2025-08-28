@@ -1,9 +1,14 @@
 const User = require("../models/user");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+
+const { JWT_SECRET } = require("../utils/config");
+
 const {
   INTERNAL_SERVER_ERROR_CODE,
   BAD_REQUEST_ERROR_CODE,
   NOT_FOUND_ERROR_CODE,
+  CONFLICT_ERROR_CODE,
 } = require("../utils/errors");
 
 // GET /users
@@ -27,8 +32,21 @@ const createUser = (req, res) => {
   const { name, avatar, email, password } = req.body;
   console.log(name, avatar, email, password);
 
-  User.create({ name, avatar, email, password })
-    .then((user) => res.status(201).send(user))
+  bcrypt
+    .hash(password, 10)
+    .then((hash) =>
+      User.create({
+        name: req.body.name,
+        avatar: req.body.avatar,
+        email: req.body.email,
+        password: hash,
+      })
+    )
+    .then((user) => {
+      const userObject = user.toObject();
+      delete userObject.password;
+      res.status(201).send(userObject);
+    })
     .catch((err) => {
       console.error(err);
       if (err.name === "ValidationError") {
@@ -36,18 +54,28 @@ const createUser = (req, res) => {
           .status(BAD_REQUEST_ERROR_CODE)
           .send({ message: "An error occurred from failed data validation." });
       }
+      if (err.code === 11000) {
+        return res.status(CONFLICT_ERROR_CODE).send({
+          message:
+            "An error occurred. Someone with this email address already exists.",
+        });
+      }
       return res
         .status(INTERNAL_SERVER_ERROR_CODE)
         .send({ message: "An error has occurred on the server." });
     });
 };
 
-// GET User by ID
-const getUserById = (req, res) => {
-  const { userId } = req.params;
-  User.findById(userId)
+// GET CURRENT USER
+const getCurrentUser = (req, res) => {
+  const { _id } = req.user;
+  User.findById(_id)
     .orFail()
-    .then((user) => res.send(user))
+    .then((user) => {
+      const userObject = user.toObject();
+      delete userObject.password;
+      res.send(userObject);
+    })
 
     .catch((err) => {
       console.error(err);
@@ -67,4 +95,70 @@ const getUserById = (req, res) => {
     });
 };
 
-module.exports = { getUsers, createUser, getUserById };
+// Authenticate Users
+const loginUser = (req, res) => {
+  console.log("Is this working?");
+  const { email, password } = req.body;
+
+  return User.findUserByCredentials(email, password)
+    .then((user) => {
+      console.log("User is in!");
+      const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
+        expiresIn: "7d",
+      });
+      res.send({ token });
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(401).send({ message: err.message });
+    });
+};
+
+// Update User Profile
+
+const updateProfile = (req, res) => {
+  console.log("Is this working?");
+  // 1. Get user ID from req.user._id
+  const { _id } = req.user;
+  // 2. Get name and avatar from req.body
+  const { name, avatar } = req.body;
+
+  // 3. Use User.findByIdAndUpdate() with proper options
+  User.findByIdAndUpdate(
+    _id,
+    { name: name, avatar: avatar },
+    { new: true, runValidators: true }
+  )
+    .orFail()
+    // 5. Return the updated user
+    .then((user) => {
+      const userObject = user.toObject();
+      delete userObject.password;
+      res.status(200).send(userObject);
+    })
+    // 4. Handle errors (Not Found, Validation, Server errors)
+    .catch((err) => {
+      console.error(err);
+      if (err.name === "DocumentNotFoundError") {
+        return res
+          .status(NOT_FOUND_ERROR_CODE)
+          .send({ message: "There is no item or user with the requested ID." });
+      }
+      if (err.name === "ValidationError") {
+        return res
+          .status(BAD_REQUEST_ERROR_CODE)
+          .send({ message: "An error occurred from failed data validation." });
+      }
+      return res
+        .status(INTERNAL_SERVER_ERROR_CODE)
+        .send({ message: "An error has occurred on the server." });
+    });
+};
+
+module.exports = {
+  getUsers,
+  createUser,
+  getCurrentUser,
+  loginUser,
+  updateProfile,
+};
