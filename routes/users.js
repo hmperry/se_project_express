@@ -6,7 +6,7 @@ const {
   getCurrentUser,
   updateProfile,
 } = require("../controllers/users");
-const { auth } = require("../middleware/auth");
+const { auth } = require("../middlewares/auth");
 
 // router.get("/", getUsers);
 router.get("/me", auth, getCurrentUser);
