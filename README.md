@@ -1,6 +1,6 @@
 # WTWR (What to Wear?): Back End
 
-The back-end project is focused on creating a server for the What to Wear application. This is the database that supports the user interactivity of adding clothing articles and other users to be able to utilize the app. The eventual goal is to create a server with an API and user authorization.
+The back-end project is focused on creating a server for the What to Wear application. This is the database that supports the user interactivity of adding clothing articles and other users to be able to utilize the app. This version of the app has user authorization implemented into the various methods of the API.
 
 ## Technologies
 
