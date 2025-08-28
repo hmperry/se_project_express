@@ -110,7 +110,7 @@ const loginUser = (req, res) => {
     })
     .catch((err) => {
       console.error(err);
-      res.status(401).send({ message: err.message });
+      res.status(400).send({ message: err.message });
     });
 };
 
