@@ -1,6 +1,6 @@
+const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
 
 const { JWT_SECRET } = require("../utils/config");
 
@@ -10,7 +10,6 @@ const {
   NOT_FOUND_ERROR_CODE,
   CONFLICT_ERROR_CODE,
   UNAUTHORIZED_ERROR_CODE,
-  FORBIDDEN_ERROR_CODE,
 } = require("../utils/errors");
 
 // GET /users
@@ -135,7 +134,7 @@ const updateProfile = (req, res) => {
   // 3. Use User.findByIdAndUpdate() with proper options
   User.findByIdAndUpdate(
     _id,
-    { name: name, avatar: avatar },
+    { name, avatar },
     { new: true, runValidators: true }
   )
     .orFail()
