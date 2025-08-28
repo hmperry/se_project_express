@@ -3,6 +3,8 @@ const {
   INTERNAL_SERVER_ERROR_CODE,
   BAD_REQUEST_ERROR_CODE,
   NOT_FOUND_ERROR_CODE,
+  UNAUTHORIZED_ERROR_CODE,
+  FORBIDDEN_ERROR_CODE,
 } = require("../utils/errors");
 
 // GET Items
@@ -51,11 +53,15 @@ const deleteItem = (req, res) => {
   Item.findById(itemId)
     .then((item) => {
       if (!item) {
-        return res.status(404).send({ message: "Item not found" });
+        return res
+          .status(NOT_FOUND_ERROR_CODE)
+          .send({ message: "Item not found" });
       }
 
       if (item.owner.toString() !== req.user._id) {
-        return res.status(403).send({ message: "Access denied" });
+        return res
+          .status(FORBIDDEN_ERROR_CODE)
+          .send({ message: "Access denied" });
       }
       return Item.findByIdAndDelete(itemId);
     })

@@ -9,6 +9,8 @@ const {
   BAD_REQUEST_ERROR_CODE,
   NOT_FOUND_ERROR_CODE,
   CONFLICT_ERROR_CODE,
+  UNAUTHORIZED_ERROR_CODE,
+  FORBIDDEN_ERROR_CODE,
 } = require("../utils/errors");
 
 // GET /users
@@ -110,7 +112,14 @@ const loginUser = (req, res) => {
     })
     .catch((err) => {
       console.error(err);
-      res.status(400).send({ message: err.message });
+      if (err.message === "Incorrect email or password") {
+        return res
+          .status(UNAUTHORIZED_ERROR_CODE)
+          .send({ message: err.message });
+      }
+      return res
+        .status(INTERNAL_SERVER_ERROR_CODE)
+        .send({ message: "An error has occurred on the server." });
     });
 };
 
