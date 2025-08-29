@@ -101,6 +101,12 @@ const loginUser = (req, res) => {
   console.log("Is this working?");
   const { email, password } = req.body;
 
+  if (email === undefined || password === undefined) {
+    return res
+      .status(BAD_REQUEST_ERROR_CODE)
+      .send({ message: "Email or password is missing." });
+  }
+
   return User.findUserByCredentials(email, password)
     .then((user) => {
       console.log("User is in!");
@@ -113,7 +119,7 @@ const loginUser = (req, res) => {
       console.error(err);
       if (err.message === "Incorrect email or password") {
         return res
-          .status(UNAUTHORIZED_ERROR_CODE)
+          .status(BAD_REQUEST_ERROR_CODE)
           .send({ message: err.message });
       }
       return res
