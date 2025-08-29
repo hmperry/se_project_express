@@ -57,7 +57,7 @@ const deleteItem = (req, res) => {
           .send({ message: "Item not found" });
       }
 
-      if (item.owner.toJSON() !== req.user._id) {
+      if (item.owner.toString() !== req.user._id) {
         return res
           .status(FORBIDDEN_ERROR_CODE)
           .send({ message: "Access denied" });
