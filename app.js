@@ -1,12 +1,13 @@
 const cors = require("cors");
 const express = require("express");
+const { limiter } = require("./utils/rateLimiter");
 const mongoose = require("mongoose");
 const helmet = require("helmet");
 const mainRouter = require("./routes/index");
 
 const app = express();
 const { PORT = 3001 } = process.env;
-
+app.use(limiter);
 app.use(helmet());
 app.use(cors());
 mongoose
