@@ -9,6 +9,7 @@ const {
   BAD_REQUEST_ERROR_CODE,
   NOT_FOUND_ERROR_CODE,
   CONFLICT_ERROR_CODE,
+  UNAUTHORIZED_ERROR_CODE,
 } = require("../utils/errors");
 
 // CREATE User
