@@ -52,24 +52,30 @@ const deleteItem = (req, res) => {
   Item.findById(itemId)
     .then((item) => {
       if (!item) {
-        return res
-          .status(NOT_FOUND_ERROR_CODE)
-          .send({ message: "Item not found" });
+        const error = new Error("Item not found");
+        error.name = "NotFoundError";
+        throw error;
       }
 
       if (item.owner.toString() !== req.user._id) {
-        return res
-          .status(FORBIDDEN_ERROR_CODE)
-          .send({ message: "Access denied" });
+        const error = new Error("Unauthorized User");
+        error.name = "UnauthorizedUser";
+        throw error;
       }
       return Item.findByIdAndDelete(itemId);
     })
     .then((item) => res.send({ data: item }))
     .catch((err) => {
       console.error(err);
-      if (err.name === "DocumentNotFoundError") {
+      if (err.name === "NotFoundError") {
         return res.status(NOT_FOUND_ERROR_CODE).send({
-          message: "There is no item or uder with the requested ID.",
+          message: "There is no item or user with the requested ID.",
+        });
+      }
+
+      if (err.name === "UnauthorizedUser") {
+        return res.status(FORBIDDEN_ERROR_CODE).send({
+          message: "Access is denied. Unauthorized user.",
         });
       }
 

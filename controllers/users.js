@@ -11,22 +11,6 @@ const {
   CONFLICT_ERROR_CODE,
 } = require("../utils/errors");
 
-// GET /users
-
-const getUsers = (req, res) => {
-  console.log("IN CONTROLLER");
-  User.find({})
-    .then((users) => {
-      res.send(users);
-    })
-    .catch((err) => {
-      console.error(err);
-      return res
-        .status(INTERNAL_SERVER_ERROR_CODE)
-        .send({ message: "An error has occurred on the server." });
-    });
-};
-
 // CREATE User
 const createUser = (req, res) => {
   const { name, avatar, email, password } = req.body;
@@ -118,7 +102,7 @@ const loginUser = (req, res) => {
       console.error(err);
       if (err.message === "Incorrect email or password") {
         return res
-          .status(BAD_REQUEST_ERROR_CODE)
+          .status(UNAUTHORIZED_ERROR_CODE)
           .send({ message: err.message });
       }
       return res
@@ -169,7 +153,6 @@ const updateProfile = (req, res) => {
 };
 
 module.exports = {
-  getUsers,
   createUser,
   getCurrentUser,
   loginUser,
