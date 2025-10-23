@@ -14,16 +14,16 @@ const {
 
 // CREATE User
 const createUser = (req, res) => {
-  const { name, avatar, email, password } = req.body;
-  console.log(name, avatar, email, password);
+  const { name, avatarUrl, email, password } = req.body;
+  console.log(name, avatarUrl, email, password);
 
   bcrypt
     .hash(password, 10)
     .then((hash) =>
       User.create({
-        name: req.body.name,
-        avatar: req.body.avatar,
-        email: req.body.email,
+        name: name,
+        avatarUrl: avatarUrl,
+        email: email,
         password: hash,
       })
     )
@@ -119,12 +119,12 @@ const updateProfile = (req, res) => {
   // 1. Get user ID from req.user._id
   const { _id } = req.user;
   // 2. Get name and avatar from req.body
-  const { name, avatar } = req.body;
+  const { name, avatarUrl } = req.body;
 
   // 3. Use User.findByIdAndUpdate() with proper options
   User.findByIdAndUpdate(
     _id,
-    { name, avatar },
+    { name, avatarUrl },
     { new: true, runValidators: true }
   )
     .orFail()
