@@ -17,5 +17,6 @@ router.delete("/:itemId", auth, deleteItem);
 router.put("/:itemId/likes", auth, likeItem);
 
 router.delete("/:itemId/likes", auth, dislikeItem);
-
+// router.patch("/:itemId/likes/add", auth, likeItem);
+// router.patch("/:itemId/likes/dislike", auth, dislikeItem);
 module.exports = router;
