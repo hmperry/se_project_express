@@ -8,19 +8,16 @@ const {
 
 // GET Items
 
-const getItems = (req, res) => {
+const getItems = (req, res, next) => {
   console.log("IN CONTROLLER for ITEMS");
   Item.find({})
     .then((items) => {
       res.send(items);
     })
-    .catch((err) => {
-      console.error(err);
-      return res
-        .status(INTERNAL_SERVER_ERROR_CODE)
-        .send({ message: "An error has occurred on the server." });
-    });
+    .catch(next);
 };
+
+// Create Item
 
 const createItem = (req, res) => {
   console.log("CONTROLLER CREATE NEW ITEMS");
@@ -31,16 +28,17 @@ const createItem = (req, res) => {
 
   Item.create({ name, weather, imageUrl, owner })
     .then((item) => res.status(201).send({ data: item }))
+
     .catch((err) => {
-      console.error(err);
       if (err.name === "ValidationError") {
-        return res
-          .status(BAD_REQUEST_ERROR_CODE)
-          .send({ message: "An error occurred from failed data validation." });
+        next(
+          new BadRequestError("An error occurred from failed data validation.")
+        );
+      } else if (err.name === "CastError") {
+        next(new BadRequestError("The id string is in an invalid format"));
+      } else {
+        next(err);
       }
-      return res
-        .status(INTERNAL_SERVER_ERROR_CODE)
-        .send({ message: "An error has occurred on the server." });
     });
 };
 
