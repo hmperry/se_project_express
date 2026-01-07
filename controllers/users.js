@@ -12,8 +12,15 @@ const {
   UNAUTHORIZED_ERROR_CODE,
 } = require("../utils/errors");
 
+const BadRequestError = require("../errors/bad-request-err");
+const ConflictError = require("../errors/conflict-err");
+const ForbiddenError = require("../errors/forbidden-err");
+const NotFoundError = require("../errors/not-found-err");
+const UnauthorizedError = require("../errors/unauthorized-err");
+// const InternalServerError = require("../errors/internal-server-err");
+
 // CREATE User
-const createUser = (req, res) => {
+const createUser = (req, res, next) => {
   const { name, avatar, email, password } = req.body;
   console.log(name, avatar, email, password);
 
@@ -35,24 +42,23 @@ const createUser = (req, res) => {
     .catch((err) => {
       console.error(err);
       if (err.name === "ValidationError") {
-        return res
-          .status(BAD_REQUEST_ERROR_CODE)
-          .send({ message: "An error occurred from failed data validation." });
+        next(
+          new BadRequestError("An error occurred from failed data validation.")
+        );
+      } else if (err.code === 11000) {
+        next(
+          new ConflictError(
+            "An error occurred. Someone with this email address already exists."
+          )
+        );
+      } else {
+        next(err);
       }
-      if (err.code === 11000) {
-        return res.status(CONFLICT_ERROR_CODE).send({
-          message:
-            "An error occurred. Someone with this email address already exists.",
-        });
-      }
-      return res
-        .status(INTERNAL_SERVER_ERROR_CODE)
-        .send({ message: "An error has occurred on the server." });
     });
 };
 
 // GET CURRENT USER
-const getCurrentUser = (req, res) => {
+const getCurrentUser = (req, res, next) => {
   const { _id } = req.user;
   User.findById(_id)
     .orFail()
@@ -65,30 +71,26 @@ const getCurrentUser = (req, res) => {
     .catch((err) => {
       console.error(err);
       if (err.name === "DocumentNotFoundError") {
-        return res
-          .status(NOT_FOUND_ERROR_CODE)
-          .send({ message: "There is no item or user with the requested ID." });
+        next(
+          new NotFoundError("There is no item or user with the requested ID.")
+        );
+      } else if (err.name === "CastError") {
+        next(
+          new BadRequestError("An error has occurred because of invalid data.")
+        );
+      } else {
+        next(err);
       }
-      if (err.name === "CastError") {
-        return res
-          .status(BAD_REQUEST_ERROR_CODE)
-          .send({ message: "An error has occurred because of invalid data." });
-      }
-      return res
-        .status(INTERNAL_SERVER_ERROR_CODE)
-        .send({ message: "An error has occurred on the server." });
     });
 };
 
 // Authenticate Users
-const loginUser = (req, res) => {
+const loginUser = (req, res, next) => {
   console.log("Is this working?");
   const { email, password } = req.body;
 
   if (email === undefined || password === undefined) {
-    return res
-      .status(BAD_REQUEST_ERROR_CODE)
-      .send({ message: "Email or password is missing." });
+    throw new BadRequestError("Email or password is missing.");
   }
 
   return User.findUserByCredentials(email, password)
@@ -101,20 +103,18 @@ const loginUser = (req, res) => {
     })
     .catch((err) => {
       console.error(err);
+
       if (err.message === "Incorrect email or password") {
-        return res
-          .status(UNAUTHORIZED_ERROR_CODE)
-          .send({ message: err.message });
+        next(new UnauthorizedError(err.message));
+      } else {
+        next(err);
       }
-      return res
-        .status(INTERNAL_SERVER_ERROR_CODE)
-        .send({ message: "An error has occurred on the server." });
     });
 };
 
 // Update User Profile
 
-const updateProfile = (req, res) => {
+const updateProfile = (req, res, next) => {
   console.log("Is this working?");
   // 1. Get user ID from req.user._id
   const { _id } = req.user;
@@ -138,18 +138,16 @@ const updateProfile = (req, res) => {
     .catch((err) => {
       console.error(err);
       if (err.name === "DocumentNotFoundError") {
-        return res
-          .status(NOT_FOUND_ERROR_CODE)
-          .send({ message: "There is no item or user with the requested ID." });
+        next(
+          new NotFoundError("There is no item or user with the requested ID.")
+        );
+      } else if (err.name === "ValidationError") {
+        next(
+          new BadRequestError("An error occurred from failed data validation.")
+        );
+      } else {
+        next(err);
       }
-      if (err.name === "ValidationError") {
-        return res
-          .status(BAD_REQUEST_ERROR_CODE)
-          .send({ message: "An error occurred from failed data validation." });
-      }
-      return res
-        .status(INTERNAL_SERVER_ERROR_CODE)
-        .send({ message: "An error has occurred on the server." });
     });
 };
 

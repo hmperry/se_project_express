@@ -5,6 +5,12 @@ const {
   NOT_FOUND_ERROR_CODE,
   FORBIDDEN_ERROR_CODE,
 } = require("../utils/errors");
+const BadRequestError = require("../errors/bad-request-err");
+const ConflictError = require("../errors/conflict-err");
+const ForbiddenError = require("../errors/forbidden-err");
+const NotFoundError = require("../errors/not-found-err");
+const UnauthorizedError = require("../errors/unauthorized-err");
+const InternalServerError = require("../errors/internal-server-err");
 
 // GET Items
 
@@ -19,7 +25,7 @@ const getItems = (req, res, next) => {
 
 // Create Item
 
-const createItem = (req, res) => {
+const createItem = (req, res, next) => {
   console.log("CONTROLLER CREATE NEW ITEMS");
 
   const { name, weather, imageUrl } = req.body;
@@ -43,53 +49,41 @@ const createItem = (req, res) => {
 };
 
 // DELETE Item by ID
-const deleteItem = (req, res) => {
+const deleteItem = (req, res, next) => {
   console.log("CONTROLLER DELETE ITEM");
   const { itemId } = req.params;
 
   Item.findById(itemId)
     .then((item) => {
       if (!item) {
-        const error = new Error("Item not found");
-        error.name = "NotFoundError";
-        throw error;
+        throw new NotFoundError(
+          "There is no item or user with the requested ID."
+        );
       }
 
       if (item.owner.toString() !== req.user._id) {
-        const error = new Error("Unauthorized User");
-        error.name = "UnauthorizedUser";
-        throw error;
+        throw new ForbiddenError("You can only delete your own items.");
       }
       return Item.findByIdAndDelete(itemId);
     })
     .then((item) => res.send({ data: item }))
     .catch((err) => {
       console.error(err);
-      if (err.name === "NotFoundError") {
-        return res.status(NOT_FOUND_ERROR_CODE).send({
-          message: "There is no item or user with the requested ID.",
-        });
-      }
 
       if (err.name === "UnauthorizedUser") {
-        return res.status(FORBIDDEN_ERROR_CODE).send({
-          message: "Access is denied. Unauthorized user.",
-        });
+        next(new UnauthorizedError("Access is denied. Unauthorized user."));
+      } else if (err.name === "CastError") {
+        next(
+          new BadRequestError("An error has occurred because of invalid data.")
+        );
+      } else {
+        next(err);
       }
-
-      if (err.name === "CastError") {
-        return res.status(BAD_REQUEST_ERROR_CODE).send({
-          message: "An error has occurred because of invalid data.",
-        });
-      }
-      return res
-        .status(INTERNAL_SERVER_ERROR_CODE)
-        .send({ message: "An error has occurred on the server." });
     });
 };
 
 // Update Like
-const likeItem = (req, res) => {
+const likeItem = (req, res, next) => {
   console.log("CONTROLLER LIKE ITEM");
   const { itemId } = req.params;
 
@@ -102,24 +96,23 @@ const likeItem = (req, res) => {
     .then((item) => res.send({ data: item }))
     .catch((err) => {
       console.error(err);
+
       if (err.name === "DocumentNotFoundError") {
-        return res
-          .status(NOT_FOUND_ERROR_CODE)
-          .send({ message: "There is no item or uder with the requested ID." });
+        next(
+          new NotFoundError("There is no item or user with the requested ID.")
+        );
+      } else if (err.name === "CastError") {
+        next(
+          new BadRequestError("An error has occurred because of invalid data.")
+        );
+      } else {
+        next(err);
       }
-      if (err.name === "CastError") {
-        return res
-          .status(BAD_REQUEST_ERROR_CODE)
-          .send({ message: "An error has occurred because of invalid data." });
-      }
-      return res
-        .status(INTERNAL_SERVER_ERROR_CODE)
-        .send({ message: "An error has occurred on the server." });
     });
 };
 
 // Dislike Item
-const dislikeItem = (req, res) => {
+const dislikeItem = (req, res, next) => {
   console.log("CONTROLLER DISLIKE ITEM");
   const { itemId } = req.params;
 
@@ -133,18 +126,16 @@ const dislikeItem = (req, res) => {
     .catch((err) => {
       console.error(err);
       if (err.name === "DocumentNotFoundError") {
-        return res
-          .status(NOT_FOUND_ERROR_CODE)
-          .send({ message: "There is no item or uder with the requested ID." });
+        next(
+          new NotFoundError("There is no item or user with the requested ID.")
+        );
+      } else if (err.name === "CastError") {
+        next(
+          new BadRequestError("An error has occurred because of invalid data.")
+        );
+      } else {
+        next(err);
       }
-      if (err.name === "CastError") {
-        return res
-          .status(BAD_REQUEST_ERROR_CODE)
-          .send({ message: "An error has occurred because of invalid data." });
-      }
-      return res
-        .status(INTERNAL_SERVER_ERROR_CODE)
-        .send({ message: "An error has occurred on the server." });
     });
 };
 
