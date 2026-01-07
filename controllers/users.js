@@ -4,17 +4,8 @@ const User = require("../models/user");
 
 const { JWT_SECRET } = require("../utils/config");
 
-const {
-  INTERNAL_SERVER_ERROR_CODE,
-  BAD_REQUEST_ERROR_CODE,
-  NOT_FOUND_ERROR_CODE,
-  CONFLICT_ERROR_CODE,
-  UNAUTHORIZED_ERROR_CODE,
-} = require("../utils/errors");
-
 const BadRequestError = require("../errors/bad-request-err");
 const ConflictError = require("../errors/conflict-err");
-const ForbiddenError = require("../errors/forbidden-err");
 const NotFoundError = require("../errors/not-found-err");
 const UnauthorizedError = require("../errors/unauthorized-err");
 // const InternalServerError = require("../errors/internal-server-err");
@@ -28,9 +19,9 @@ const createUser = (req, res, next) => {
     .hash(password, 10)
     .then((hash) =>
       User.create({
-        name: name,
-        avatar: avatar,
-        email: email,
+        name,
+        avatar,
+        email,
         password: hash,
       })
     )

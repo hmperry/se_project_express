@@ -1,7 +1,7 @@
 const { Joi, celebrate } = require("celebrate");
 const validator = require("validator");
 
-//Validate URLs
+// Validate URLs
 const validateURL = (value, helpers) => {
   if (validator.isURL(value)) {
     return value;
@@ -9,7 +9,7 @@ const validateURL = (value, helpers) => {
   return helpers.error("string.uri");
 };
 
-//Clothing
+// Clothing
 module.exports.validateCardBody = celebrate({
   body: Joi.object().keys({
     name: Joi.string().required().min(2).max(30).messages({
@@ -24,7 +24,7 @@ module.exports.validateCardBody = celebrate({
   }),
 });
 
-//User info - Creating User
+// User info - Creating User
 module.exports.validateUserBody = celebrate({
   body: Joi.object().keys({
     name: Joi.string().required().min(2).max(30).messages({
@@ -41,7 +41,7 @@ module.exports.validateUserBody = celebrate({
   }),
 });
 
-//User Info - Updating User
+// User Info - Updating User
 module.exports.validateUserUpdateBody = celebrate({
   body: Joi.object().keys({
     name: Joi.string().required().min(2).max(30).messages({
@@ -56,7 +56,7 @@ module.exports.validateUserUpdateBody = celebrate({
   }),
 });
 
-//Authentication when user logs in
+// Authentication when user logs in
 module.exports.validateAuthentication = celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().email(),
@@ -64,7 +64,7 @@ module.exports.validateAuthentication = celebrate({
   }),
 });
 
-//user and clothing item IDs when accessed
+// user and clothing item IDs when accessed
 
 module.exports.validateId = celebrate({
   params: Joi.object().keys({
