@@ -1,5 +1,5 @@
 const router = require("express").Router();
-const { NOT_FOUND_ERROR_CODE } = require("../utils/errors");
+const NotFoundError = require("../errors/not-found-err");
 const { createUser, loginUser } = require("../controllers/users");
 
 const {
@@ -16,8 +16,8 @@ router.post("/signup", validateUserBody, createUser);
 
 router.post("/signin", validateAuthentication, loginUser);
 
-router.use((req, res) => {
-  res.status(NOT_FOUND_ERROR_CODE).send({ message: "Route not found" });
+router.use((req, res, next) => {
+  next(new NotFoundError("This page is not found."));
 });
 
 module.exports = router;
